@@ -84,7 +84,6 @@ NSString* INFO_VOLUME_CHANGED = @"(NATIVE AUDIO) Volume changed.";
         if (existingReference == nil) {
 
             NSString* basePath = [[NSBundle mainBundle] resourcePath];
-			NSString* execPath = [[NSBundle mainBundle] executablePath];
             NSString* path = [NSString stringWithFormat:@"%@", assetPath];
 
 
@@ -92,8 +91,10 @@ NSString* INFO_VOLUME_CHANGED = @"(NATIVE AUDIO) Volume changed.";
 			if (![[NSFileManager defaultManager] fileExistsAtPath : path]) {
 				path = [NSString stringWithFormat:@"%@/%@/%@", basePath, @"www" ,assetPath];
 
+				//cocoon dev app
 				if (![[NSFileManager defaultManager] fileExistsAtPath : path]) {
-					path = [NSString stringWithFormat:@"%@/%@/%@/%@", basePath, @"tmp", @"www" ,assetPath];
+				    NSString *tempPath = [NSTemporaryDirectory()];
+					path = [NSString stringWithFormat:@"%@/%@/%@", tempPath, @"www" ,assetPath];
 				}
 			}
 			
@@ -101,7 +102,7 @@ NSString* INFO_VOLUME_CHANGED = @"(NATIVE AUDIO) Volume changed.";
 
 			if (![[NSFileManager defaultManager] fileExistsAtPath : path]) {
 				NSError * error;
-				NSArray * directoryContents = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:execPath error:&error];
+				NSArray * directoryContents = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:path error:&error];
 
 				NSString *RESULT = [[directoryContents valueForKey:@"description"] componentsJoinedByString:@" - "];
 				//NSString *RESULT = [NSString stringWithFormat:@"%@ (%@, %@)", ERROR_ASSETPATH_INCORRECT, assetPath, path];
