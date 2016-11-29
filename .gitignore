@@ -12,3 +12,4 @@ plugins
 *.swo
 *.log
 *.DS_Store
+*.sln
