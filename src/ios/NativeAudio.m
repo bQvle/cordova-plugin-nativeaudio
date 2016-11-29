@@ -96,7 +96,7 @@ NSString* INFO_VOLUME_CHANGED = @"(NATIVE AUDIO) Volume changed.";
                 [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString: RESULT] callbackId:callbackId];
 			}
 
-            else ([[NSFileManager defaultManager] fileExistsAtPath : path]) {
+            else {
                 NSURL *pathURL = [NSURL fileURLWithPath : path];
                 CFURLRef soundFileURLRef = (CFURLRef) CFBridgingRetain(pathURL);
                 SystemSoundID soundID;
