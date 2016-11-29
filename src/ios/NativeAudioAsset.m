@@ -19,7 +19,7 @@ static const CGFloat FADE_DELAY = 0.08;
     if(self) {        
         NSURL *pathURL = [NSURL fileURLWithPath : path];
 		NSData *data = [[NSFileManager defaultManager] contentsAtPath:pathURL];
-        AVAudioPlayer *player = [[AVAudioPlayer alloc] initWithData:data error: NULL];
+        player = [[AVAudioPlayer alloc] initWithData:data error: NULL];
 
         player.volume = volume.floatValue;
         [player prepareToPlay];
