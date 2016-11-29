@@ -325,9 +325,9 @@ NSString* INFO_VOLUME_CHANGED = @"(NATIVE AUDIO) Volume changed.";
 - (void) unload:(CDVInvokedUrlCommand *)command
 {
 
-    NSString *callbackId = command.callbackId;
+    NSString* callbackId = command.callbackId;
     NSArray* arguments = command.arguments;
-    NSString *audioID = [arguments objectAtIndex:0];
+    NSString* audioID = [arguments objectAtIndex:0];
 
     if ( audioMapping ) {
         NSObject* asset = audioMapping[audioID];
@@ -362,10 +362,10 @@ NSString* INFO_VOLUME_CHANGED = @"(NATIVE AUDIO) Volume changed.";
 
 - (void) setVolumeForComplexAsset:(CDVInvokedUrlCommand *)command
 {
-    NSString *callbackId = command.callbackId;
+    NSString* callbackId = command.callbackId;
     NSArray* arguments = command.arguments;
-    NSString *audioID = [arguments objectAtIndex:0];
-    NSNumber *volume = nil;
+    NSString* audioID = [arguments objectAtIndex:0];
+    NSNumber* volume = nil;
 
     if ( [arguments count] > 1 ) {
 
@@ -373,12 +373,12 @@ NSString* INFO_VOLUME_CHANGED = @"(NATIVE AUDIO) Volume changed.";
 
         if([volume isEqual:nil]) {
 
-            NSString *RESULT = [NSString stringWithFormat:@"%@ (%@)", ERROR_VOLUME_NIL, audioID];
+            NSString* RESULT = [NSString stringWithFormat:@"%@ (%@)", ERROR_VOLUME_NIL, audioID];
             [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString: RESULT] callbackId:callbackId];
         }
     } else if (([volume floatValue] < 0.0f) || ([volume floatValue] > 1.0f)) {
 
-        NSString *RESULT = [NSString stringWithFormat:@"%@ (%@)", ERROR_VOLUME_FORMAT, audioID];
+        NSString* RESULT = [NSString stringWithFormat:@"%@ (%@)", ERROR_VOLUME_FORMAT, audioID];
         [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString: RESULT] callbackId:callbackId];
     }
 

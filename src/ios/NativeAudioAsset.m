@@ -19,8 +19,7 @@ static const CGFloat FADE_DELAY = 0.08;
     if(self) {        
         NSURL *pathURL = [NSURL fileURLWithPath : path];
 		NSData *data = [[NSFileManager defaultManager] contentsAtPath:pathURL];
-
-        AVAudioPlayer *player = [[AVAudioPlayer alloc] initWithData:data error: NULL];
+        player = [[AVAudioPlayer alloc] initWithData:data error: NULL];
 
         player.volume = volume.floatValue;
         [player prepareToPlay];
@@ -84,23 +83,16 @@ static const CGFloat FADE_DELAY = 0.08;
 // The delay determines how fast the increase happens
 - (void)stopWithFade
 {
-    BOOL shouldContinue = NO;
-    
-        
     if (player.isPlaying && player.volume > FADE_STEP) {
         player.volume -= FADE_STEP;
-        shouldContinue = YES;
+        [self performSelector:@selector(stopWithFade) withObject:nil afterDelay:fadeDelay.floatValue];
     } else {
         // Stop and get the sound ready for playing again
         [player stop];
         player.volume = initialVolume.floatValue;
         player.currentTime = 0;
     }
-    
-    
-    if(shouldContinue) {
-        [self performSelector:@selector(stopWithFade) withObject:nil afterDelay:fadeDelay.floatValue];
-    }
+
 }
 
 - (void) loop
@@ -119,6 +111,7 @@ static const CGFloat FADE_DELAY = 0.08;
 
 - (void) setVolume:(NSNumber*) volume;
 {
+	initialVolume = volume.floatValue;
     [player setVolume:volume.floatValue];
 }
 
