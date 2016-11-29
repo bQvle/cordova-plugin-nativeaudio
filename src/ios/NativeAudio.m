@@ -101,7 +101,11 @@ NSString* INFO_VOLUME_CHANGED = @"(NATIVE AUDIO) Volume changed.";
 
 
 			if (![[NSFileManager defaultManager] fileExistsAtPath : path]) {
-				NSString *RESULT = [NSString stringWithFormat:@"%@ (%@, %@)", ERROR_ASSETPATH_INCORRECT, assetPath, path];
+				NSError * error;
+				NSArray * directoryContents = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:basePath error:&error];
+
+				NSString *RESULT = [[directoryContents valueForKey:@"description"] componentsJoinedByString:@" - "];
+				//NSString *RESULT = [NSString stringWithFormat:@"%@ (%@, %@)", ERROR_ASSETPATH_INCORRECT, assetPath, path];
                 [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString: RESULT] callbackId:callbackId];
 			}
 
