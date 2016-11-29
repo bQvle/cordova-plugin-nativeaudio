@@ -12,7 +12,7 @@
 typedef void (^CompleteCallback)(NSString*);
 
 @interface NativeAudioAsset : NSObject<AVAudioPlayerDelegate> {
-	AVAudioPlayer* player;
+	AVAudioPlayer *player;
     NSString* audioId;
     CompleteCallback finished;
     NSNumber *initialVolume;
