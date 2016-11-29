@@ -16,50 +16,49 @@ import android.content.res.AssetFileDescriptor;
 public class NativeAudioAsset
 {
 
-	private NativeAudioAssetComplex voice;
-	private int playIndex = 0;
+	private NativeAudioAssetComplex audio;
 	
 	public NativeAudioAsset(AssetFileDescriptor afd, float volume) throws IOException
 	{
-		voice = new NativeAudioAssetComplex(afd, volume);
+		audio = new NativeAudioAssetComplex(afd, volume);
 	}
 	
 	public void play(Callable<Void> completeCb) throws IOException
 	{
-		voice.play(completeCb);
+		audio.play(completeCb);
 	}
 
 	public boolean pause()
 	{
-		boolean wasPlaying |= voice.pause();
+		boolean wasPlaying |= audio.pause();
 		return wasPlaying;
 	}
 
 	public void resume()
 	{
 		// only resumes first instance, assume being used on a stream and not multiple sfx
-	    voice.resume();
+	    audio.resume();
 
 	}
 
     public void stop()
 	{
-		voice.stop();
+		audio.stop();
 	}
 	
 	public void loop() throws IOException
 	{
-		voice.loop();
+		audio.loop();
 	}
 	
 	public void unload() throws IOException
 	{
 		this.stop();
-		voice.unload();
+		audio.unload();
 	}
 	
 	public void setVolume(float volume)
 	{
-		voice.setVolume(volume);
+		audio.setVolume(volume);
 	}
 }

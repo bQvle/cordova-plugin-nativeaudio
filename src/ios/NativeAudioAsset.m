@@ -24,7 +24,6 @@ static const CGFloat FADE_DELAY = 0.08;
 
         player.volume = volume.floatValue;
         [player prepareToPlay];
-        [voices addObject:player];
         [player setDelegate:self];
             
         if(delay)
