@@ -83,18 +83,17 @@ NSString* INFO_VOLUME_CHANGED = @"(NATIVE AUDIO) Volume changed.";
     [self.commandDelegate runInBackground:^{
         if (existingReference == nil) {
 
-            NSString* basePath = [[NSBundle mainBundle] resourcePath];
+            NSString* basePath = [[[NSBundle mainBundle] resourcePath] stringByAppendingPathComponent:@"www"];
             NSString* path = [NSString stringWithFormat:@"%@", assetPath];
 
 
 
 			if (![[NSFileManager defaultManager] fileExistsAtPath : path]) {
-				path = [NSString stringWithFormat:@"%@/%@/%@", basePath, @"www" ,assetPath];
+				path = [NSString stringWithFormat:@"%@/%@", basePath ,assetPath];
 
-				//cocoon dev app
 				if (![[NSFileManager defaultManager] fileExistsAtPath : path]) {
-				    NSString *tempPath = [NSTemporaryDirectory()];
-					path = [NSString stringWithFormat:@"%@/%@/%@", tempPath, @"www" ,assetPath];
+					NSString *tempPath = [NSTemporaryDirectory() stringByAppendingPathComponent:@"www"];
+					path = [NSString stringWithFormat:@"%@/%@", tempPath,assetPath];
 				}
 			}
 			
