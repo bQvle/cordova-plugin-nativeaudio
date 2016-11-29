@@ -85,11 +85,15 @@ NSString* INFO_VOLUME_CHANGED = @"(NATIVE AUDIO) Volume changed.";
 
             NSString* basePath = [[[NSBundle mainBundle] resourcePath] stringByAppendingPathComponent:@"www"];
             NSString* path = [NSString stringWithFormat:@"%@", assetPath];
-            NSString* pathFromWWW = [NSString stringWithFormat:@"%@/%@", basePath, assetPath];
+
+
+			if ([[NSFileManager defaultManager] fileExistsAtPath : path]) {
+				path = [NSString stringWithFormat:@"%@/%@", basePath, assetPath];
+			}
+
+			
 
             if ([[NSFileManager defaultManager] fileExistsAtPath : path]) {
-
-
                 NSURL *pathURL = [NSURL fileURLWithPath : path];
                 CFURLRef soundFileURLRef = (CFURLRef) CFBridgingRetain(pathURL);
                 SystemSoundID soundID;
@@ -99,18 +103,8 @@ NSString* INFO_VOLUME_CHANGED = @"(NATIVE AUDIO) Volume changed.";
                 NSString *RESULT = [NSString stringWithFormat:@"%@ (%@)", INFO_ASSET_LOADED, audioID];
                 [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString: RESULT] callbackId:callbackId];
 
-            } else if ([[NSFileManager defaultManager] fileExistsAtPath : pathFromWWW]) {
-                NSURL *pathURL = [NSURL fileURLWithPath : pathFromWWW];
-                CFURLRef        soundFileURLRef = (CFURLRef) CFBridgingRetain(pathURL);
-                SystemSoundID soundID;
-                AudioServicesCreateSystemSoundID(soundFileURLRef, & soundID);
-                audioMapping[audioID] = [NSNumber numberWithInt:soundID];
-
-                NSString *RESULT = [NSString stringWithFormat:@"%@ (%@)", INFO_ASSET_LOADED, audioID];
-                [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString: RESULT] callbackId:callbackId];
-
-            } else {
-                NSString *RESULT = [NSString stringWithFormat:@"%@ (%@)", ERROR_ASSETPATH_INCORRECT, assetPath];
+            }  else {
+                NSString *RESULT = [NSString stringWithFormat:@"%@ (%@, %@)", ERROR_ASSETPATH_INCORRECT, assetPath, path];
                 [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString: RESULT] callbackId:callbackId];
             }
         } else {
