@@ -1,4 +1,4 @@
-//
+﻿//
 // 
 //  NativeAudioAsset.m
 //  NativeAudioAsset
@@ -40,9 +40,11 @@ static const CGFloat FADE_DELAY = 0.08;
 
 - (void) play
 {
-    [player setCurrentTime:0.0];
-    player.numberOfLoops = 0;
-    [player play];
+	dispatch_async(dispatch_get_global_queue(QOS_CLASS_BACKGROUN‌​D, 0)) {		
+		[player setCurrentTime:0.0];
+		player.numberOfLoops = 0;
+		[player play];
+	}
 }
 
 
