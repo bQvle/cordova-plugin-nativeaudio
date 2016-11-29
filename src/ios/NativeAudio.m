@@ -94,7 +94,7 @@ NSString* INFO_VOLUME_CHANGED = @"(NATIVE AUDIO) Volume changed.";
 					path = [NSString stringWithFormat:@"%@/%@/%@", basePath, @"www" ,assetPath];
 
 					if (![[NSFileManager defaultManager] fileExistsAtPath : path]) {
-						path = [NSString stringWithFormat:@"%@/%@/%@/%@", basePath, @"temp", @"www" ,assetPath];
+						path = [NSString stringWithFormat:@"%@/%@/%@/%@", basePath, @"tmp", @"www" ,assetPath];
 					}
 				}
 			}
@@ -170,8 +170,20 @@ NSString* INFO_VOLUME_CHANGED = @"(NATIVE AUDIO) Volume changed.";
 
     [self.commandDelegate runInBackground:^{
         if (existingReference == nil) {
-            NSString* basePath = [[[NSBundle mainBundle] resourcePath] stringByAppendingPathComponent:@"www"];
-            NSString* path = [NSString stringWithFormat:@"%@/%@", basePath, assetPath];
+            NSString* basePath = [[NSBundle mainBundle] resourcePath];
+            NSString* path = [NSString stringWithFormat:@"%@", assetPath];
+
+			if (![[NSFileManager defaultManager] fileExistsAtPath : path]) {
+				path = [NSString stringWithFormat:@"%@/%@", basePath, assetPath];
+
+				if (![[NSFileManager defaultManager] fileExistsAtPath : path]) {
+					path = [NSString stringWithFormat:@"%@/%@/%@", basePath, @"www" ,assetPath];
+
+					if (![[NSFileManager defaultManager] fileExistsAtPath : path]) {
+						path = [NSString stringWithFormat:@"%@/%@/%@/%@", basePath, @"tmp", @"www" ,assetPath];
+					}
+				}
+			}
 
             if ([[NSFileManager defaultManager] fileExistsAtPath : path]) {
                 NativeAudioAsset* asset = [[NativeAudioAsset alloc] initWithPath:path
