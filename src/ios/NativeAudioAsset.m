@@ -19,12 +19,12 @@ static const CGFloat FADE_DELAY = 0.08;
     if(self) {        
         NSURL *pathURL = [NSURL fileURLWithPath : path];
 		NSData *data = [[NSFileManager defaultManager] contentsAtPath:pathURL];
-        player = [[AVAudioPlayer alloc] initWithData:data error: NULL];
+        AVAudioPlayer *player = [[AVAudioPlayer alloc] initWithData:data error: NULL];
 
         player.volume = volume.floatValue;
         [player prepareToPlay];
         [player setDelegate:self];
-            
+         
         if(delay)
         {
             fadeDelay = delay;
@@ -92,7 +92,6 @@ static const CGFloat FADE_DELAY = 0.08;
         player.volume = initialVolume.floatValue;
         player.currentTime = 0;
     }
-
 }
 
 - (void) loop
@@ -111,7 +110,6 @@ static const CGFloat FADE_DELAY = 0.08;
 
 - (void) setVolume:(NSNumber*) volume;
 {
-	initialVolume = volume.floatValue;
     [player setVolume:volume.floatValue];
 }
 
@@ -121,14 +119,14 @@ static const CGFloat FADE_DELAY = 0.08;
     self->finished = cb;
 }
 
-- (void) audioPlayerDidFinishPlaying:(AVAudioPlayer *)player successfully:(BOOL)flag
+- (void) audioPlayerDidFinishPlaying:(AVAudioPlayer *)ap successfully:(BOOL)flag
 {
     if (self->finished) {
         self->finished(self->audioId);
     }
 }
 
-- (void) audioPlayerDecodeErrorDidOccur:(AVAudioPlayer *)player error:(NSError *)error
+- (void) audioPlayerDecodeErrorDidOccur:(AVAudioPlayer *)ap error:(NSError *)error
 {
     if (self->finished) {
         self->finished(self->audioId);
