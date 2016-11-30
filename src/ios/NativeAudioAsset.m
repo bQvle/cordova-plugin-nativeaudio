@@ -113,6 +113,13 @@ static const CGFloat FADE_DELAY = 0.08;
     [player setVolume:volume.floatValue];
 }
 
+- (void) setRate:(NSNumber*) rate;
+{
+ if (!player.enableRate) { player.enableRate = true };
+ player.rate = rate;
+   // [player setVolume:volume.floatValue];
+}
+
 - (void) setCallbackAndId:(CompleteCallback)cb audioId:(NSString*)aID
 {
     self->audioId = aID;
