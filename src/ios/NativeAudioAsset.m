@@ -40,12 +40,9 @@ static const CGFloat FADE_DELAY = 0.08;
 
 - (void) play
 {
-	dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
-	//dispatch_async(dispatch_get_global_queue(QOS_CLASS_BACKGROUN‌​D, 0)) {		
-		[player setCurrentTime:0.0];
-		player.numberOfLoops = 0;
-		[player play];
-	});
+	[player setCurrentTime:0.0];
+	player.numberOfLoops = 0;
+	[player play];
 }
 
 
