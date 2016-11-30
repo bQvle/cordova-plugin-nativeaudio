@@ -20,47 +20,43 @@
 
 	}
 
-	func setOptions(command: CDVInvokedUrlCommand) {
+	@objc(setOptions:) func setOptions(command: CDVInvokedUrlCommand) {
 		self.commandDelegate!.sendPluginResult(CDVPluginResult(status: CDVCommandStatus_ERROR, messageAsString: "not implemented yet"), callbackId: command.callbackId)
 	}
 
-	func preloadSimple(command: CDVInvokedUrlCommand) {
+	@objc(preloadSimple:) func preloadSimple(command: CDVInvokedUrlCommand) {
 		self.commandDelegate!.sendPluginResult(CDVPluginResult(status: CDVCommandStatus_ERROR, messageAsString: "not implemented yet"), callbackId: command.callbackId)
 	}
 
-	func preloadSimple(command: CDVInvokedUrlCommand) {
+	@objc(preloadComplex:) func preloadComplex(command: CDVInvokedUrlCommand) {
 		self.commandDelegate!.sendPluginResult(CDVPluginResult(status: CDVCommandStatus_ERROR, messageAsString: "not implemented yet"), callbackId: command.callbackId)
 	}
 
-	func preloadComplex(command: CDVInvokedUrlCommand) {
+	@objc(play:) func play(command: CDVInvokedUrlCommand) {
 		self.commandDelegate!.sendPluginResult(CDVPluginResult(status: CDVCommandStatus_ERROR, messageAsString: "not implemented yet"), callbackId: command.callbackId)
 	}
 
-	func play(command: CDVInvokedUrlCommand) {
+	@objc(stop:) func stop(command: CDVInvokedUrlCommand) {
 		self.commandDelegate!.sendPluginResult(CDVPluginResult(status: CDVCommandStatus_ERROR, messageAsString: "not implemented yet"), callbackId: command.callbackId)
 	}
 
-	func stop(command: CDVInvokedUrlCommand) {
+	@objc(loop:) func loop(command: CDVInvokedUrlCommand) {
 		self.commandDelegate!.sendPluginResult(CDVPluginResult(status: CDVCommandStatus_ERROR, messageAsString: "not implemented yet"), callbackId: command.callbackId)
 	}
 
-	func loop(command: CDVInvokedUrlCommand) {
+	@objc(unload:) func unload(command: CDVInvokedUrlCommand) {
 		self.commandDelegate!.sendPluginResult(CDVPluginResult(status: CDVCommandStatus_ERROR, messageAsString: "not implemented yet"), callbackId: command.callbackId)
 	}
 
-	func unload(command: CDVInvokedUrlCommand) {
+	@objc(setVolumeForComplexAsset:) func setVolumeForComplexAsset(command: CDVInvokedUrlCommand) {
 		self.commandDelegate!.sendPluginResult(CDVPluginResult(status: CDVCommandStatus_ERROR, messageAsString: "not implemented yet"), callbackId: command.callbackId)
 	}
 
-	func setVolumeForComplexAsset(command: CDVInvokedUrlCommand) {
+	@objc(setRateForComplexAsset:) func setRateForComplexAsset(command: CDVInvokedUrlCommand) {
 		self.commandDelegate!.sendPluginResult(CDVPluginResult(status: CDVCommandStatus_ERROR, messageAsString: "not implemented yet"), callbackId: command.callbackId)
 	}
 
-	func setRateForComplexAsset(command: CDVInvokedUrlCommand) {
-		self.commandDelegate!.sendPluginResult(CDVPluginResult(status: CDVCommandStatus_ERROR, messageAsString: "not implemented yet"), callbackId: command.callbackId)
-	}
-
-	func addCompleteListener(command: CDVInvokedUrlCommand) {
+	@objc(addCompleteListener:) func addCompleteListener(command: CDVInvokedUrlCommand) {
 		self.commandDelegate!.sendPluginResult(CDVPluginResult(status: CDVCommandStatus_ERROR, messageAsString: "not implemented yet"), callbackId: command.callbackId)
 	}
 }
