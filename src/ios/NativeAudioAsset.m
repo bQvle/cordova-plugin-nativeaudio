@@ -45,7 +45,7 @@ static const CGFloat FADE_DELAY = 0.08;
 		[player setCurrentTime:0.0];
 		player.numberOfLoops = 0;
 		[player play];
-	}
+	});
 }
 
 
