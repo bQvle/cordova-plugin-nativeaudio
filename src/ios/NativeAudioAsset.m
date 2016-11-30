@@ -115,8 +115,11 @@ static const CGFloat FADE_DELAY = 0.08;
 
 - (void) setRate:(NSNumber*) rate;
 {
- if (!player.enableRate) { player.enableRate = true };
- player.rate = rate;
+ if (!player.enableRate) { 
+	 player.enableRate = YES 
+ };
+
+ player.rate = rate.floatValue;
    // [player setVolume:volume.floatValue];
 }
 
