@@ -56,11 +56,11 @@
         <framework src="AVFoundation.framework"/>
         <framework src="AudioToolbox.framework"/>
 
-        <header-file src="src/ios/NativeAudio.h"/>
-        <source-file src="src/ios/NativeAudio.m"/>
+        <!--<header-file src="src/ios/NativeAudio.h"/>-->
+        <source-file src="src/ios/NativeAudio.swift"/>
 
-        <header-file src="src/ios/NativeAudioAsset.h"/>
-        <source-file src="src/ios/NativeAudioAsset.m"/>
+        <!--<header-file src="src/ios/NativeAudioAsset.h"/>-->
+        <source-file src="src/ios/NativeAudioAsset.swift"/>
 
     </platform>
 
