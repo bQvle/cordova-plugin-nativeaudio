@@ -30,11 +30,14 @@ static AVAudioMixerNode *mixer;
         NSURL *pathURL = [NSURL fileURLWithPath : path];
 		//NSData *data = [[NSFileManager defaultManager] contentsAtPath:pathURL];
 		file = [[AVAudioFile alloc] initForReading:pathURL error:nil];
+    
+    
         player = [[AVAudioPlayerNode alloc] init];
     
         player.volume = volume.floatValue;
     
     [engine attachNode:player];
+    [engine connect:player to:mixer format:file.processingFormat];
         if(delay)
         {
             fadeDelay = delay;
@@ -50,7 +53,7 @@ static AVAudioMixerNode *mixer;
 - (void) play
 {
     [player scheduleFile:file atTime:nil completionHandler:^{
-       [self audioPlayerDidFinishPlaying:(self) successfully:(YES)];
+        [self audioPlayerDidFinishPlaying:self successfully:YES];
     }];
 	[player play];
 }
