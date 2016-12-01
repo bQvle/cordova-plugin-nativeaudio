@@ -7,12 +7,14 @@
 //
 
 #import <Foundation/Foundation.h>
-#import <AVFoundation/AVAudioPlayer.h>
+#import <AVFoundation/AVFoundation.h>
+
 
 typedef void(^CompleteCallback)(NSString*);
 
-@interface NativeAudioAsset : NSObject<AVAudioPlayerDelegate>{
-	AVAudioPlayer* player;
+@interface NativeAudioAsset : NSObject  {
+	AVAudioPlayerNode* player;
+	AVAudioFile* file;
 	NSString* audioId;
 	CompleteCallback finished;
 	NSNumber *initialVolume;
@@ -29,6 +31,6 @@ typedef void(^CompleteCallback)(NSString*);
 -(void)setVolume:(NSNumber*)volume;
 -(void)setRate:(NSNumber*)rate;
 -(void)setCallbackAndId:(CompleteCallback)cb audioId : (NSString*)audioId;
--(void)audioPlayerDidFinishPlaying:(AVAudioPlayer *)ap successfully : (BOOL)flag;
--(void)audioPlayerDecodeErrorDidOccur:(AVAudioPlayer *)ap error : (NSError *)error;
+-(void)audioPlayerDidFinishPlaying:(NativeAudioAsset *)ap successfully : (BOOL)flag;
+-(void)audioPlayerDecodeErrorDidOccur:(NativeAudioAsset *)ap error : (NSError *)error;
 @end

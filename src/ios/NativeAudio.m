@@ -508,17 +508,8 @@ static void (mySystemSoundCompletionProc)(SystemSoundID ssID,void* clientData)
                 
                 if ([asset isKindOfClass:[NativeAudioAsset class]]) {
                     NativeAudioAsset *_asset = (NativeAudioAsset*) asset;
-                    [_asset setCallbackAndId:^(NSString* audioID) {
-                        [self sendCompleteCallback:audioID];
-                    } audioId:audioID];
+                    [_asset setCallbackAndId:^(NSString* audioID) {[self sendCompleteCallback:audioID];} audioId:audioID];
                  
-                } else if ( [asset isKindOfClass:[NSNumber class]] ) {
-                    NSNumber *_asset = (NSNumber*) asset;
-                    AudioServicesAddSystemSoundCompletion([_asset intValue],
-                                                                       NULL,
-                                                                       NULL,
-                                                                       mySystemSoundCompletionProc,
-                                                                       (__bridge void *)(self));
                 }
             } else {
                 

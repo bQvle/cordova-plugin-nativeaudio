@@ -12,19 +12,29 @@
 
 static const CGFloat FADE_STEP = 0.05;
 static const CGFloat FADE_DELAY = 0.08;
+static bool Initialized= NO;
+
+static AVAudioEngine *engine;
+static AVAudioMixerNode *mixer;
 
 -(id) initWithPath:(NSString*) path withVolume:(NSNumber*) volume withFadeDelay:(NSNumber *)delay
 {
-    self = [super init];
-    if(self) {        
+    if (!Initialized) {
+        engine = [[AVAudioEngine alloc] init];
+        mixer = [engine mainMixerNode];
+        [engine startAndReturnError:nil];
+        Initialized= YES;
+    }
+    
+    
         NSURL *pathURL = [NSURL fileURLWithPath : path];
-		NSData *data = [[NSFileManager defaultManager] contentsAtPath:pathURL];
-        player = [[AVAudioPlayer alloc] initWithData:data error: NULL];
-
+		//NSData *data = [[NSFileManager defaultManager] contentsAtPath:pathURL];
+		file = [[AVAudioFile alloc] initForReading:pathURL error:nil];
+        player = [[AVAudioPlayerNode alloc] init];
+    
         player.volume = volume.floatValue;
-        [player prepareToPlay];
-        [player setDelegate:self];
-         
+    
+    [engine attachNode:player];
         if(delay)
         {
             fadeDelay = delay;
@@ -34,14 +44,14 @@ static const CGFloat FADE_DELAY = 0.08;
         }
             
         initialVolume = volume;
-    }
-    return(self);
+    return self;
 }
 
 - (void) play
 {
-	[player setCurrentTime:0.0];
-	player.numberOfLoops = 0;
+    [player scheduleFile:file atTime:nil completionHandler:^{
+       [self audioPlayerDidFinishPlaying:(self) successfully:(YES)];
+    }];
 	[player play];
 }
 
@@ -53,12 +63,9 @@ static const CGFloat FADE_DELAY = 0.08;
 
     if (!player.isPlaying)
     {
-        [player setCurrentTime:0.0];
-        player.numberOfLoops = 0;
-        player.volume = 0;
-        [player play];
+        [self play];
         dispatch_async(dispatch_get_main_queue(), ^{
-            [self performSelector:@selector(playWithFade) withObject:nil afterDelay:fadeDelay.floatValue];
+            [player performSelector:@selector(playWithFade) withObject:nil afterDelay:fadeDelay.floatValue];
         });
     }
     else
@@ -67,7 +74,7 @@ static const CGFloat FADE_DELAY = 0.08;
         {
             player.volume += FADE_STEP;
             dispatch_async(dispatch_get_main_queue(), ^{
-                [self performSelector:@selector(playWithFade) withObject:nil afterDelay:fadeDelay.floatValue];
+                [player performSelector:@selector(playWithFade) withObject:nil afterDelay:fadeDelay.floatValue];
             });
         }
     }
@@ -85,21 +92,21 @@ static const CGFloat FADE_DELAY = 0.08;
 {
     if (player.isPlaying && player.volume > FADE_STEP) {
         player.volume -= FADE_STEP;
-        [self performSelector:@selector(stopWithFade) withObject:nil afterDelay:fadeDelay.floatValue];
+        
+        [player performSelector:@selector(stopWithFade) withObject:nil afterDelay:fadeDelay.floatValue];
     } else {
         // Stop and get the sound ready for playing again
         [player stop];
         player.volume = initialVolume.floatValue;
-        player.currentTime = 0;
     }
 }
 
 - (void) loop
 {
-    [self stop];
-    [player setCurrentTime:0.0];
-    player.numberOfLoops = -1;
-    [player play];
+    //[self stop];
+    //[player setCurrentTime:0.0];
+    //player.numberOfLoops = -1;
+    //[player play];
 }
 
 - (void) unload 
@@ -115,10 +122,6 @@ static const CGFloat FADE_DELAY = 0.08;
 
 - (void) setRate:(NSNumber*) rate;
 {
- if (!player.enableRate) { 
-	 player.enableRate = YES;
- };
-
  player.rate = rate.floatValue;
    // [player setVolume:volume.floatValue];
 }
@@ -129,14 +132,14 @@ static const CGFloat FADE_DELAY = 0.08;
     self->finished = cb;
 }
 
-- (void) audioPlayerDidFinishPlaying:(AVAudioPlayer *)ap successfully:(BOOL)flag
+- (void) audioPlayerDidFinishPlaying:(NativeAudioAsset *)ap successfully:(BOOL)flag
 {
     if (self->finished) {
         self->finished(self->audioId);
     }
 }
 
-- (void) audioPlayerDecodeErrorDidOccur:(AVAudioPlayer *)ap error:(NSError *)error
+- (void) audioPlayerDecodeErrorDidOccur:(NativeAudioAsset *)ap error:(NSError *)error
 {
     if (self->finished) {
         self->finished(self->audioId);
