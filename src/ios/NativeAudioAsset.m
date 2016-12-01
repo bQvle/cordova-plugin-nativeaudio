@@ -151,6 +151,7 @@ bool rateInitialized = NO;
         rateInitialized = YES;
     }
     pitcher.rate = rate.floatValue;
+    pitcher.pitch = 1000 * rate.floatValue;
 }
 
 - (void) setCallbackAndId:(CompleteCallback)cb audioId:(NSString*)aID
