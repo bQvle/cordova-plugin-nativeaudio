@@ -16,45 +16,68 @@ static bool Initialized= NO;
 
 static AVAudioEngine *engine;
 static AVAudioMixerNode *mixer;
+static NSMutableDictionary *buffers;
 
 -(id) initWithPath:(NSString*) path withVolume:(NSNumber*) volume withFadeDelay:(NSNumber *)delay
 {
     if (!Initialized) {
+        buffers = [NSMutableDictionary dictionary];
         engine = [[AVAudioEngine alloc] init];
         mixer = [engine mainMixerNode];
-        [engine startAndReturnError:nil];
-        Initialized= YES;
     }
     
     
-        NSURL *pathURL = [NSURL fileURLWithPath : path];
-		//NSData *data = [[NSFileManager defaultManager] contentsAtPath:pathURL];
-		file = [[AVAudioFile alloc] initForReading:pathURL error:nil];
+    PCMBuffer = [self getBuffer:path];
     
     
-        player = [[AVAudioPlayerNode alloc] init];
+    player = [[AVAudioPlayerNode alloc] init];
     
-        player.volume = volume.floatValue;
+    player.volume = volume.floatValue;
     
     [engine attachNode:player];
-    [engine connect:player to:mixer format:file.processingFormat];
-        if(delay)
-        {
-            fadeDelay = delay;
-        }
-        else {
-            fadeDelay = [NSNumber numberWithFloat:FADE_DELAY];
-        }
+    [engine connect:player to:mixer format:PCMBuffer.format];
+    
+    if(delay)
+    {
+        fadeDelay = delay;
+    }
+    else {
+        fadeDelay = [NSNumber numberWithFloat:FADE_DELAY];
+    }
             
-        initialVolume = volume;
+    initialVolume = volume;
+    
+    
+    if (!Initialized) {
+        [engine startAndReturnError:nil];
+        Initialized= YES;
+    }
     return self;
 }
 
+- (AVAudioPCMBuffer*) getBuffer:(NSString*) path;
+{
+    AVAudioPCMBuffer *buffer = buffers[path];
+    
+    if (buffer == nil) {
+        
+        NSURL *pathURL = [NSURL fileURLWithPath : path];
+        AVAudioFile *fil = [[AVAudioFile alloc] initForReading:pathURL error:nil];
+        AVAudioFrameCount length = (AVAudioFrameCount)fil.length;
+        buffer = [[AVAudioPCMBuffer alloc] initWithPCMFormat:fil.processingFormat frameCapacity:length];
+        [fil readIntoBuffer:buffer error:nil];
+        buffers[path] = buffer;
+    }
+    
+    
+    return buffer;
+}
+
+
+
 - (void) play
 {
-    [player scheduleFile:file atTime:nil completionHandler:^{
-        [self audioPlayerDidFinishPlaying:self successfully:YES];
-    }];
+    [player scheduleBuffer:PCMBuffer atTime:nil options:AVAudioPlayerNodeBufferInterrupts completionHandler:^{[self audioPlayerDidFinishPlaying:self successfully:YES];}];
 	[player play];
 }
 
@@ -106,10 +129,11 @@ static AVAudioMixerNode *mixer;
 
 - (void) loop
 {
-    //[self stop];
-    //[player setCurrentTime:0.0];
-    //player.numberOfLoops = -1;
-    //[player play];
+    if (player.isPlaying) {
+        [player stop];
+    }
+    [player scheduleBuffer:PCMBuffer atTime:nil options:AVAudioPlayerNodeBufferLoops completionHandler:^{[self audioPlayerDidFinishPlaying:self successfully:YES];}];
+    [player play];
 }
 
 - (void) unload 
