@@ -18,9 +18,9 @@ public class NativeAudioAsset
 
 	private NativeAudioAssetComplex audio;
 	
-	public NativeAudioAsset(AssetFileDescriptor afd, float volume) throws IOException
+	public NativeAudioAsset(AssetFileDescriptor afd, float volume, float rate) throws IOException
 	{
-		audio = new NativeAudioAssetComplex(afd, volume);
+		audio = new NativeAudioAssetComplex(afd, volume, rate);
 	}
 	
 	public void play(Callable<Void> completeCb) throws IOException
@@ -60,5 +60,10 @@ public class NativeAudioAsset
 	public void setVolume(float volume)
 	{
 		audio.setVolume(volume);
+	}
+
+	public void setRate(float rate)
+	{
+		audio.setRate(rate);
 	}
 }

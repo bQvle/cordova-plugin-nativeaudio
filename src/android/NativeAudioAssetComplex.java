@@ -29,7 +29,7 @@ public class NativeAudioAssetComplex implements OnPreparedListener, OnCompletion
 	private int state;
     Callable<Void> completeCallback;
 
-	public NativeAudioAssetComplex( AssetFileDescriptor afd, float volume)  throws IOException
+	public NativeAudioAssetComplex( AssetFileDescriptor afd, float volume, float rate)  throws IOException
 	{
 		state = INVALID;
 		mp = new MediaPlayer();
@@ -38,6 +38,12 @@ public class NativeAudioAssetComplex implements OnPreparedListener, OnCompletion
 		mp.setDataSource( afd.getFileDescriptor(), afd.getStartOffset(), afd.getLength());
 		mp.setAudioStreamType(AudioManager.STREAM_MUSIC); 
 		mp.setVolume(volume, volume);
+
+		if (rate < 1) {
+			setRate(rate);
+		}
+		
+
 		mp.prepare();
 	}
 	
@@ -119,6 +125,11 @@ public class NativeAudioAssetComplex implements OnPreparedListener, OnCompletion
 		{
                 // I don't know why this gets thrown; catch here to save app
 		}
+	}
+
+	public void setRate(float rate) 
+	{
+	   //not implementet
 	}
 	
 	public void loop() throws IOException

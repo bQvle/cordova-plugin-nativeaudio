@@ -15,13 +15,14 @@ typedef void(^CompleteCallback)(NSString*);
 @interface NativeAudioAsset : NSObject  {
 	AVAudioPlayerNode* player;
 	AVAudioPCMBuffer* PCMBuffer;
+    AVAudioUnitTimePitch* pitcher;
 	NSString* audioId;
 	CompleteCallback finished;
 	NSNumber *initialVolume;
 	NSNumber *fadeDelay;
 }
 
--(id)initWithPath:(NSString*)path withVolume : (NSNumber*)volume withFadeDelay : (NSNumber *)delay;
+-(id)initWithPath:(NSString*)path withVolume : (NSNumber*)volume withRate : (NSNumber*)rate withFadeDelay : (NSNumber *)delay;
 -(void)play;
 -(void)playWithFade;
 -(void)stop;

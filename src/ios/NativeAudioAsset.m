@@ -16,18 +16,16 @@ static bool Initialized= NO;
 
 static AVAudioEngine *engine;
 static AVAudioMixerNode *mixer;
-static NSMutableDictionary *buffers;
 
--(id) initWithPath:(NSString*) path withVolume:(NSNumber*) volume withFadeDelay:(NSNumber *)delay
+-(id) initWithPath:(NSString*) path withVolume:(NSNumber*) volume withRate:(NSNumber*) rate withFadeDelay:(NSNumber *)delay
 {
     if (!Initialized) {
-        buffers = [NSMutableDictionary dictionary];
         engine = [[AVAudioEngine alloc] init];
         mixer = [engine mainMixerNode];
     }
     
     
-    PCMBuffer = [self getBuffer:path];
+    [self initBuffer:path];
     
     
     player = [[AVAudioPlayerNode alloc] init];
@@ -47,6 +45,9 @@ static NSMutableDictionary *buffers;
             
     initialVolume = volume;
     
+    if (rate.floatValue < 1.0) {
+        [self setRate: rate];
+    }
     
     if (!Initialized) {
         [engine startAndReturnError:nil];
@@ -55,22 +56,13 @@ static NSMutableDictionary *buffers;
     return self;
 }
 
-- (AVAudioPCMBuffer*) getBuffer:(NSString*) path;
+- (void) initBuffer:(NSString*) path;
 {
-    AVAudioPCMBuffer *buffer = buffers[path];
-    
-    if (buffer == nil) {
-        
         NSURL *pathURL = [NSURL fileURLWithPath : path];
         AVAudioFile *fil = [[AVAudioFile alloc] initForReading:pathURL error:nil];
         AVAudioFrameCount length = (AVAudioFrameCount)fil.length;
-        buffer = [[AVAudioPCMBuffer alloc] initWithPCMFormat:fil.processingFormat frameCapacity:length];
-        [fil readIntoBuffer:buffer error:nil];
-        //buffers[path] = buffer;
-    }
-    
-    
-    return buffer;
+        PCMBuffer = [[AVAudioPCMBuffer alloc] initWithPCMFormat:fil.processingFormat frameCapacity:length];
+        [fil readIntoBuffer:PCMBuffer error:nil];
 }
 
 
@@ -147,10 +139,18 @@ static NSMutableDictionary *buffers;
     [player setVolume:volume.floatValue];
 }
 
+
+bool rateInitialized = NO;
 - (void) setRate:(NSNumber*) rate;
 {
- player.rate = rate.floatValue;
-   // [player setVolume:volume.floatValue];
+    if (!rateInitialized) {
+        pitcher = [[AVAudioUnitTimePitch alloc] init];
+        [engine attachNode:pitcher];
+        [engine connect:pitcher to:mixer format:PCMBuffer.format];
+        [engine connect:player to:pitcher format:PCMBuffer.format];
+        rateInitialized = YES;
+    }
+    pitcher.rate = rate.floatValue;
 }
 
 - (void) setCallbackAndId:(CompleteCallback)cb audioId:(NSString*)aID

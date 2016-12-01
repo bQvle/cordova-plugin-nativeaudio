@@ -146,13 +146,24 @@ NSString* INFO_RATE_CHANGED = @"(NATIVE AUDIO) Rate changed.";
         volume = [NSNumber numberWithFloat:1.0f];
     }
 
+	NSNumber *rate = nil;
+    if ( [arguments count] > 3 ) {
+        rate = [arguments objectAtIndex:3];
+        if([rate isEqual:nil]) {
+            rate = [NSNumber numberWithFloat:1.0f];
+        }
+    } else {
+        rate = [NSNumber numberWithFloat:1.0f];
+    }
+
+
     
     NSNumber *delay = nil;
-    if ( [arguments count] > 3 && [arguments objectAtIndex:3] != [NSNull null])
+    if ( [arguments count] > 4 && [arguments objectAtIndex:4] != [NSNull null])
     {
         // The delay is determines how fast the asset is
         // faded in and out
-        delay = [arguments objectAtIndex:3];
+        delay = [arguments objectAtIndex:4];
     }
 
     if(audioMapping == nil) {
@@ -184,8 +195,9 @@ NSString* INFO_RATE_CHANGED = @"(NATIVE AUDIO) Rate changed.";
 
             } else {
                  NativeAudioAsset* asset = [[NativeAudioAsset alloc] initWithPath:path
-                                                                      withVolume:volume
-                                                                   withFadeDelay:delay];
+                                                                       withVolume:volume
+																	     withRate:rate
+                                                                    withFadeDelay:delay];
                 
                 audioMapping[audioID] = asset;
 
