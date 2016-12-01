@@ -66,7 +66,7 @@ static NSMutableDictionary *buffers;
         AVAudioFrameCount length = (AVAudioFrameCount)fil.length;
         buffer = [[AVAudioPCMBuffer alloc] initWithPCMFormat:fil.processingFormat frameCapacity:length];
         [fil readIntoBuffer:buffer error:nil];
-        buffers[path] = buffer;
+        //buffers[path] = buffer;
     }
     
     
