@@ -287,7 +287,7 @@ NSString* INFO_RATE_CHANGED = @"(NATIVE AUDIO) Rate changed.";
     }
 
     if ( audioMapping ) {
-        NSObject* _asset = audioMapping[audioID];
+        NativeAudioAsset* _asset = audioMapping[audioID];
 
         if (_asset != nil){
             [_asset setRate:rate];
