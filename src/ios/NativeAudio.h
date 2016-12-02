@@ -27,6 +27,4 @@
 -(void)setVolume:(CDVInvokedUrlCommand *)command;
 -(void)setRate:(CDVInvokedUrlCommand *)command;
 -(void)addCompleteListener:(CDVInvokedUrlCommand *)command;
--(void)parseOptions:(NSDictionary*)options;
-
 @end
