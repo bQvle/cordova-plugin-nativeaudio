@@ -14,7 +14,7 @@ NSString* ERROR_ASSETPATH_INCORRECT = @"(NATIVE AUDIO) Asset not found.";
 NSString* ERROR_REFERENCE_EXISTS = @"(NATIVE AUDIO) Asset reference already exists.";
 NSString* ERROR_REFERENCE_MISSING = @"(NATIVE AUDIO) Asset reference does not exist.";
 NSString* ERROR_VOLUME_NIL = @"(NATIVE AUDIO) Volume cannot be empty.";
-NSString* ERROR_VOLUME_FORMAT = @"(NATIVE AUDIO) Volume is declared as float between 0.0 - 3.0";
+NSString* ERROR_VOLUME_FORMAT = @"(NATIVE AUDIO) Volume is declared as float between 0.0 - 1.0";
 NSString* ERROR_RATE_NIL = @"(NATIVE AUDIO) Rate cannot be empty.";
 NSString* ERROR_RATE_FORMAT = @"(NATIVE AUDIO) Rate is declared as float between 0.0 - 3.0";
 
@@ -52,11 +52,11 @@ NSString* INFO_RATE_CHANGED = @"(NATIVE AUDIO) Rate changed.";
             [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString: RESULT] callbackId:callbackId];
         }
     
-	} else if (([volume floatValue] < 0.0f) || ([volume floatValue] > 3.0f)) {
+	} else if (([volume floatValue] < 0.0f) || ([volume floatValue] > 1.0f)) {
         NSString* RESULT = [NSString stringWithFormat:@"%@", ERROR_VOLUME_FORMAT];
         [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString: RESULT] callbackId:callbackId];
     } else {
-		[mixer setOutputVolume:[volume floatValue]];
+		mixer.outputVolume = [volume floatValue];
 		[self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString: INFO_VOLUME_CHANGED] callbackId:callbackId];
 	}
 }
@@ -143,9 +143,8 @@ NSString* INFO_RATE_CHANGED = @"(NATIVE AUDIO) Rate changed.";
 
     [self.commandDelegate runInBackground:^{
         if (audioMapping) {
-            NSObject* asset = audioMapping[audioID];
-            if (asset != nil){
-                NativeAudioAsset *_asset = (NativeAudioAsset*) asset;
+            NativeAudioAsset* _asset = audioMapping[audioID];
+            if (_asset != nil){
                 [_asset play];
                 NSString *RESULT = [NSString stringWithFormat:@"%@ (%@)", INFO_PLAYBACK_PLAY, audioID];
                 [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString: RESULT] callbackId:callbackId];
@@ -167,10 +166,9 @@ NSString* INFO_RATE_CHANGED = @"(NATIVE AUDIO) Rate changed.";
     NSString *audioID = [arguments objectAtIndex:0];
 
     if ( audioMapping ) {
-        NSObject* asset = audioMapping[audioID];
+        NativeAudioAsset* _asset = audioMapping[audioID];
 
-        if (asset != nil){
-            NativeAudioAsset *_asset = (NativeAudioAsset*) asset;
+        if (_asset != nil){
             [_asset stop];
             NSString *RESULT = [NSString stringWithFormat:@"%@ (%@)", INFO_PLAYBACK_STOP, audioID];
             [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString: RESULT] callbackId:callbackId];
@@ -192,9 +190,8 @@ NSString* INFO_RATE_CHANGED = @"(NATIVE AUDIO) Rate changed.";
 
 
     if ( audioMapping ) {
-        NSObject* asset = audioMapping[audioID];
-        if (asset != nil){
-            NativeAudioAsset *_asset = (NativeAudioAsset*) asset;
+        NativeAudioAsset* _asset = audioMapping[audioID];
+        if (_asset != nil){
             [_asset loop];
             NSString *RESULT = [NSString stringWithFormat:@"%@ (%@)", INFO_PLAYBACK_LOOP, audioID];
             [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString: RESULT] callbackId:callbackId];
@@ -213,10 +210,9 @@ NSString* INFO_RATE_CHANGED = @"(NATIVE AUDIO) Rate changed.";
     NSString* audioID = [arguments objectAtIndex:0];
 
     if ( audioMapping ) {
-        NSObject* asset = audioMapping[audioID];
+        NativeAudioAsset* _asset = audioMapping[audioID];
 
-        if (asset != nil){
-            NativeAudioAsset *_asset = (NativeAudioAsset*) asset;
+        if (_asset != nil){
             [_asset unload];
         } else {
             NSString *RESULT = [NSString stringWithFormat:@"%@ (%@)", ERROR_REFERENCE_MISSING, audioID];
@@ -252,10 +248,9 @@ NSString* INFO_RATE_CHANGED = @"(NATIVE AUDIO) Rate changed.";
     }
 
     if ( audioMapping ) {
-        NSObject* asset = [audioMapping objectForKey: audioID];
+        NativeAudioAsset* _asset = audioMapping[audioID];
 
-        if (asset != nil){
-            NativeAudioAsset *_asset = (NativeAudioAsset*) asset;
+        if (_asset != nil){
             [_asset setVolume:volume];
 
             NSString *RESULT = [NSString stringWithFormat:@"%@ (%@)", INFO_VOLUME_CHANGED, audioID];
@@ -292,12 +287,10 @@ NSString* INFO_RATE_CHANGED = @"(NATIVE AUDIO) Rate changed.";
     }
 
     if ( audioMapping ) {
-        NSObject* asset = [audioMapping objectForKey: audioID];
+        NSObject* _asset = audioMapping[audioID];
 
-        if (asset != nil){
-            NativeAudioAsset *_asset = (NativeAudioAsset*) asset;
+        if (_asset != nil){
             [_asset setRate:rate];
-
             NSString *RESULT = [NSString stringWithFormat:@"%@ (%@)", INFO_RATE_CHANGED, audioID];
             [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString: RESULT] callbackId:callbackId];
         } else {
@@ -327,15 +320,14 @@ NSString* INFO_RATE_CHANGED = @"(NATIVE AUDIO) Rate changed.";
     [self.commandDelegate runInBackground:^{
         if (audioMapping) {
             
-            NSObject* asset = audioMapping[audioID];
+            NativeAudioAsset* _asset = audioMapping[audioID];
             
-            if (asset != nil){
+            if (_asset != nil){
                 
                 if(completeCallbacks == nil) {
                     completeCallbacks = [NSMutableDictionary dictionary];
                 }
                 completeCallbacks[audioID] = command.callbackId;
-                NativeAudioAsset *_asset = (NativeAudioAsset*) asset;
                 [_asset setCallback:^(NSString* audioID) {[self sendCompleteCallback:audioID];} audioId:audioID];
             } else {
                 NSString *RESULT = [NSString stringWithFormat:@"%@ (%@)", ERROR_REFERENCE_MISSING, audioID];
