@@ -55,10 +55,10 @@ NSString* INFO_RATE_CHANGED = @"(NATIVE AUDIO) Rate changed.";
 	} else if (([volume floatValue] < 0.0f) || ([volume floatValue] > 1.0f)) {
         NSString* RESULT = [NSString stringWithFormat:@"%@", ERROR_VOLUME_FORMAT];
         [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString: RESULT] callbackId:callbackId];
-    } else {
-		mixer.outputVolume = [volume floatValue];
-		[self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString: INFO_VOLUME_CHANGED] callbackId:callbackId];
-	}
+    } 
+
+	mixer.outputVolume = [volume floatValue];
+	[self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString: INFO_VOLUME_CHANGED] callbackId:callbackId];
 }
 
 
