@@ -29,7 +29,7 @@ static AVAudioMixerNode *mixer;
     
     [self initBuffer:path];
     player = [[AVAudioPlayerNode alloc] init];
-    pitcher = [[AVAudioUnitTimePitch alloc] init];
+    pitcher = [[AVAudioUnitVarispeed alloc] init];
     [engine attachNode:pitcher];
     [engine attachNode:player];
     [engine connect:pitcher to:mixer format:PCMBuffer.format];
@@ -148,8 +148,6 @@ static AVAudioMixerNode *mixer;
     else {
         pitcher.bypass = NO;
         pitcher.rate = rateValue;
-        float pitchfactor = (pitcher.rate - 1.0f) * 1000;
-        pitcher.pitch = pitchfactor;
     }
 }
 
