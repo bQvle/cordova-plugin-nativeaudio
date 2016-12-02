@@ -44,15 +44,16 @@ NSString* INFO_RATE_CHANGED = @"(NATIVE AUDIO) Rate changed.";
 {
 	NSString *callbackId = command.callbackId;
     NSArray *arguments = command.arguments;
+    NSNumber *volume = nil;
     if ( [arguments count] > 0) {
         volume = [arguments objectAtIndex:0];
         if([volume isEqual:nil]) {
-            NSString* RESULT = [NSString stringWithFormat:@"%@ (%@)", ERROR_VOLUME_NIL, audioID];
+            NSString* RESULT = [NSString stringWithFormat:@"%@", ERROR_VOLUME_NIL];
             [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString: RESULT] callbackId:callbackId];
         }
     
 	} else if (([volume floatValue] < 0.0f) || ([volume floatValue] > 3.0f)) {
-        NSString* RESULT = [NSString stringWithFormat:@"%@ (%@)", ERROR_VOLUME_FORMAT, audioID];
+        NSString* RESULT = [NSString stringWithFormat:@"%@", ERROR_VOLUME_FORMAT];
         [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString: RESULT] callbackId:callbackId];
     } else {
 		[mixer setOutputVolume:[volume floatValue]];
