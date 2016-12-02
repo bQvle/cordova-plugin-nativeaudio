@@ -8,29 +8,25 @@
 
 #import <Foundation/Foundation.h>
 #import <Cordova/CDVPlugin.h>
-#import <AudioToolbox/AudioToolbox.h>
+#import <AVFoundation/AVFoundation.h>
 #import "NativeAudioAsset.h"
 
 @interface NativeAudio : CDVPlugin{
 	NSMutableDictionary* audioMapping;
 	NSMutableDictionary* completeCallbacks;
+	AVAudioEngine* engine;
+	AVAudioMixerNode* mixer;
 }
 
-#define OPT_FADE_MUSIC  @"fadeMusic"
-
-@property (assign)BOOL fadeMusic;
-
--(void)setOptions:(CDVInvokedUrlCommand *)command;
--(void)preloadSimple:(CDVInvokedUrlCommand *)command;
--(void)preloadComplex:(CDVInvokedUrlCommand *)command;
+-(void)setMasterVolume:(CDVInvokedUrlCommand *)command;
+-(void)preload:(CDVInvokedUrlCommand *)command;
 -(void)play:(CDVInvokedUrlCommand *)command;
 -(void)stop:(CDVInvokedUrlCommand *)command;
 -(void)loop:(CDVInvokedUrlCommand *)command;
 -(void)unload:(CDVInvokedUrlCommand *)command;
--(void)setVolumeForComplexAsset:(CDVInvokedUrlCommand *)command;
--(void)setRateForComplexAsset:(CDVInvokedUrlCommand *)command;
+-(void)setVolume:(CDVInvokedUrlCommand *)command;
+-(void)setRate:(CDVInvokedUrlCommand *)command;
 -(void)addCompleteListener:(CDVInvokedUrlCommand *)command;
-
 -(void)parseOptions:(NSDictionary*)options;
 
 @end

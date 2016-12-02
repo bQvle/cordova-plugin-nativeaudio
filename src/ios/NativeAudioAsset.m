@@ -10,23 +10,11 @@
 
 @implementation NativeAudioAsset
 
-static const CGFloat FADE_STEP = 0.05;
-static const CGFloat FADE_DELAY = 0.08;
-static bool Initialized= NO;
-
-static AVAudioEngine *engine;
-static AVAudioMixerNode *mixer;
-
--(id) initWithPath:(NSString*) path withVolume:(NSNumber*) volume withRate:(NSNumber*) rate withFadeDelay:(NSNumber *)delay
+-(id) initWithEngine:(AVAudioEngine*)mainEngine Path:(NSString*) path Volume:(NSNumber*) volume Rate:(NSNumber*) rate
 {
-    if (!Initialized) {
-        engine = [[AVAudioEngine alloc] init];
-        mixer = [engine mainMixerNode];
-    }
-    
-    
-    
-    
+    engine = mainEngine;
+    AVAudioMixerNode *mixer = [engine mainMixerNode];
+
     [self initBuffer:path];
     player = [[AVAudioPlayerNode alloc] init];
     pitcher = [[AVAudioUnitVarispeed alloc] init];
@@ -36,22 +24,6 @@ static AVAudioMixerNode *mixer;
     [engine connect:player to:pitcher format:PCMBuffer.format];
     [self setRate: rate];
     [self setVolume: volume];
-    
-    
-    if(delay)
-    {
-        fadeDelay = delay;
-    }
-    else {
-        fadeDelay = [NSNumber numberWithFloat:FADE_DELAY];
-    }
-            
-    initialVolume = volume;
-    
-    if (!Initialized) {
-        [engine startAndReturnError:nil];
-        Initialized= YES;
-    }
     return self;
 }
 
@@ -68,34 +40,13 @@ static AVAudioMixerNode *mixer;
 
 - (void) play
 {
-    [player scheduleBuffer:PCMBuffer atTime:nil options:AVAudioPlayerNodeBufferInterrupts completionHandler:^{[self audioPlayerDidFinishPlaying:self successfully:YES];}];
+    [player scheduleBuffer:PCMBuffer atTime:nil options:AVAudioPlayerNodeBufferInterrupts completionHandler:^{
+        [self finishedCallback];
+    }];
 	[player play];
 }
 
 
-// The volume is increased repeatedly by the fade step amount until the last step where the audio is stopped.
-// The delay determines how fast the decrease happens
-- (void)playWithFade
-{
-
-    if (!player.isPlaying)
-    {
-        [self play];
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [player performSelector:@selector(playWithFade) withObject:nil afterDelay:fadeDelay.floatValue];
-        });
-    }
-    else
-    {
-        if(player.volume < initialVolume.floatValue)
-        {
-            player.volume += FADE_STEP;
-            dispatch_async(dispatch_get_main_queue(), ^{
-                [player performSelector:@selector(playWithFade) withObject:nil afterDelay:fadeDelay.floatValue];
-            });
-        }
-    }
-}
 
 - (void) stop
 {
@@ -103,34 +54,26 @@ static AVAudioMixerNode *mixer;
   
 }
 
-// The volume is decreased repeatedly by the fade step amount until the volume reaches the configured level.
-// The delay determines how fast the increase happens
-- (void)stopWithFade
-{
-    if (player.isPlaying && player.volume > FADE_STEP) {
-        player.volume -= FADE_STEP;
-        
-        [player performSelector:@selector(stopWithFade) withObject:nil afterDelay:fadeDelay.floatValue];
-    } else {
-        // Stop and get the sound ready for playing again
-        [player stop];
-        player.volume = initialVolume.floatValue;
-    }
-}
 
 - (void) loop
 {
     if (player.isPlaying) {
         [player stop];
     }
-    [player scheduleBuffer:PCMBuffer atTime:nil options:AVAudioPlayerNodeBufferLoops completionHandler:^{[self audioPlayerDidFinishPlaying:self successfully:YES];}];
+    [player scheduleBuffer:PCMBuffer atTime:nil options:AVAudioPlayerNodeBufferLoops completionHandler:^{[self finishedCallback];}];
     [player play];
 }
 
 - (void) unload 
 {
     [self stop];
+    [engine detachNode:player];
+    [engine detachNode:pitcher];
+    [engine disconnectNodeOutput:pitcher];
+    [engine disconnectNodeOutput:player];
+    pitcher = nil;
     player = nil;
+    PCMBuffer = nil;
 }
 
 - (void) setVolume:(NSNumber*) volume;
@@ -151,24 +94,18 @@ static AVAudioMixerNode *mixer;
     }
 }
 
-- (void) setCallbackAndId:(CompleteCallback)cb audioId:(NSString*)aID
+- (void) setCallback:(CompleteCallback)cb audioId:(NSString*)aID
 {
     self->audioId = aID;
     self->finished = cb;
 }
 
-- (void) audioPlayerDidFinishPlaying:(NativeAudioAsset *)ap successfully:(BOOL)flag
+- (void) finishedCallback
 {
     if (self->finished) {
         self->finished(self->audioId);
     }
 }
 
-- (void) audioPlayerDecodeErrorDidOccur:(NativeAudioAsset *)ap error:(NSError *)error
-{
-    if (self->finished) {
-        self->finished(self->audioId);
-    }
-}
 
 @end

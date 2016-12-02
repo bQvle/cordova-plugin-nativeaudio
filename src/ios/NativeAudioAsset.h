@@ -13,6 +13,7 @@
 typedef void(^CompleteCallback)(NSString*);
 
 @interface NativeAudioAsset : NSObject  {
+    AVAudioEngine* engine;
 	AVAudioPlayerNode* player;
 	AVAudioPCMBuffer* PCMBuffer;
     AVAudioUnitVarispeed* pitcher;
@@ -22,16 +23,13 @@ typedef void(^CompleteCallback)(NSString*);
 	NSNumber *fadeDelay;
 }
 
--(id)initWithPath:(NSString*)path withVolume : (NSNumber*)volume withRate : (NSNumber*)rate withFadeDelay : (NSNumber *)delay;
+-(id)initWithEngine:(AVAudioEngine*)mainEngine Path:(NSString*)path Volume : (NSNumber*)volume Rate : (NSNumber*)rate;
 -(void)play;
--(void)playWithFade;
 -(void)stop;
--(void)stopWithFade;
 -(void)loop;
 -(void)unload;
 -(void)setVolume:(NSNumber*)volume;
 -(void)setRate:(NSNumber*)rate;
--(void)setCallbackAndId:(CompleteCallback)cb audioId : (NSString*)audioId;
--(void)audioPlayerDidFinishPlaying:(NativeAudioAsset *)ap successfully : (BOOL)flag;
--(void)audioPlayerDecodeErrorDidOccur:(NativeAudioAsset *)ap error : (NSError *)error;
+-(void)setCallback:(CompleteCallback)cb audioId : (NSString*)audioId;
+-(void)finishedCallback;
 @end

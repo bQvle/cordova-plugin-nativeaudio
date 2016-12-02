@@ -8,62 +8,173 @@
 package com.rjfun.cordova.plugin.nativeaudio;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.concurrent.Callable;
 
 import android.content.res.AssetFileDescriptor;
+import android.media.AudioManager;
+import android.media.MediaPlayer;
+import android.media.MediaPlayer.OnCompletionListener;
+import android.media.MediaPlayer.OnPreparedListener;
 
-public class NativeAudioAsset
-{
+public class NativeAudioAsset implements OnPreparedListener, OnCompletionListener {
 
-	private NativeAudioAssetComplex audio;
+	private static final int INVALID = 0;
+	private static final int PREPARED = 1;
+	private static final int PENDING_PLAY = 2;
+	private static final int PLAYING = 3;
+	private static final int PENDING_LOOP = 4;
+	private static final int LOOPING = 5;
 	
-	public NativeAudioAsset(AssetFileDescriptor afd, float volume, float rate) throws IOException
+	private MediaPlayer mp;
+	private int state;
+    Callable<Void> completeCallback;
+
+	public NativeAudioAsset( AssetFileDescriptor afd, float volume, float rate)  throws IOException
 	{
-		audio = new NativeAudioAssetComplex(afd, volume, rate);
+		state = INVALID;
+		mp = new MediaPlayer();
+        mp.setOnCompletionListener(this);
+        mp.setOnPreparedListener(this);
+		mp.setDataSource( afd.getFileDescriptor(), afd.getStartOffset(), afd.getLength());
+		mp.setAudioStreamType(AudioManager.STREAM_MUSIC); 
+		setVolume(volume);
+		setRate(rate);	
+		mp.prepare();
 	}
 	
 	public void play(Callable<Void> completeCb) throws IOException
 	{
-		audio.play(completeCb);
+        completeCallback = completeCb;
+		invokePlay( false );
+	}
+	
+	private void invokePlay( Boolean loop )
+	{
+		Boolean playing = mp.isPlaying();
+		if ( playing )
+		{
+			mp.pause();
+			mp.setLooping(loop);
+			mp.seekTo(0);
+			mp.start();
+		}
+		if ( !playing && state == PREPARED )
+		{
+			state = (loop ? PENDING_LOOP : PENDING_PLAY);
+			onPrepared( mp );
+		}
+		else if ( !playing )
+		{
+			state = (loop ? PENDING_LOOP : PENDING_PLAY);
+			mp.setLooping(loop);
+			mp.start();
+		}
 	}
 
 	public boolean pause()
 	{
-		boolean wasPlaying |= audio.pause();
-		return wasPlaying;
+		try
+		{
+    				if ( mp.isPlaying() )
+				{
+					mp.pause();
+					return true;
+				}
+        	}
+		catch (IllegalStateException e)
+		{
+		// I don't know why this gets thrown; catch here to save app
+		}
+		return false;
 	}
 
 	public void resume()
 	{
-		// only resumes first instance, assume being used on a stream and not multiple sfx
-	    audio.resume();
-
+		mp.start();
 	}
 
     public void stop()
 	{
-		audio.stop();
+		try
+		{
+			if ( mp.isPlaying() )
+			{
+				state = INVALID;
+				mp.pause();
+				mp.seekTo(0);
+	           	}
+		}
+	        catch (IllegalStateException e)
+	        {
+            // I don't know why this gets thrown; catch here to save app
+	        }
+	}
+
+	public void setVolume(float volume) 
+	{
+	        try
+	        {
+			mp.setVolume(volume,volume);
+            	}
+            	catch (IllegalStateException e) 
+		{
+                // I don't know why this gets thrown; catch here to save app
+		}
+	}
+
+	public void setRate(float rate) 
+	{
+	   //not implementet
 	}
 	
 	public void loop() throws IOException
 	{
-		audio.loop();
+		invokePlay( true );
 	}
 	
 	public void unload() throws IOException
 	{
 		this.stop();
-		audio.unload();
+		mp.release();
 	}
 	
-	public void setVolume(float volume)
+	public void onPrepared(MediaPlayer mPlayer) 
 	{
-		audio.setVolume(volume);
+		if (state == PENDING_PLAY) 
+		{
+			mp.setLooping(false);
+			mp.seekTo(0);
+			mp.start();
+			state = PLAYING;
+		}
+		else if ( state == PENDING_LOOP )
+		{
+			mp.setLooping(true);
+			mp.seekTo(0);
+			mp.start();
+			state = LOOPING;
+		}
+		else
+		{
+			state = PREPARED;
+			mp.seekTo(0);
+		}
 	}
-
-	public void setRate(float rate)
+	
+	public void onCompletion(MediaPlayer mPlayer)
 	{
-		audio.setRate(rate);
+		if (state != LOOPING)
+		{
+			this.state = INVALID;
+			try {
+				this.stop();
+				if (completeCallback != null)
+                completeCallback.call();
+			}
+			catch (Exception e)
+			{
+				e.printStackTrace();
+			}
+		}
 	}
 }

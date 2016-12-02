@@ -22,19 +22,12 @@
 var exec = require('cordova/exec');
 
 module.exports  = {
-    setOptions: function(options, successCallback, errorCallback) {
-
-        return cordova.exec(successCallback, errorCallback, "NativeAudio", "setOptions", [options]);
-    },
-
-    preloadSimple: function(id, assetPath, successCallback, errorCallback) {
-
-        return cordova.exec(successCallback, errorCallback, "NativeAudio", "preloadSimple", [id, assetPath]);
+    setMasterVolume: function (volume, successCallback, errorCallback) {
+        return cordova.exec(successCallback, errorCallback, "NativeAudio", "setMasterVolume", [parseFloat(volume)]);
     },
     
-    preloadComplex: function(id, assetPath, volume, rate, delay, successCallback, errorCallback) {
-
-        return cordova.exec(successCallback, errorCallback, "NativeAudio", "preloadComplex", [id, assetPath, parseFloat(volume), parseFloat(rate), parseFloat(delay)]);
+    preload: function(id, assetPath, volume, rate, successCallback, errorCallback) {
+        return cordova.exec(successCallback, errorCallback, "NativeAudio", "preloadComplex", [id, assetPath, parseFloat(volume), parseFloat(rate)]);
     },
 
     play: function(id, successCallback, errorCallback, completeCallback) {
@@ -42,7 +35,6 @@ module.exports  = {
         	cordova.exec(completeCallback, errorCallback, "NativeAudio", "addCompleteListener", [id]);    
         }
         return cordova.exec(successCallback, errorCallback, "NativeAudio", "play", [id]);
-        
     },
 
     stop: function(id, successCallback, errorCallback) {
@@ -57,11 +49,11 @@ module.exports  = {
         return cordova.exec(successCallback, errorCallback, "NativeAudio", "unload", [id]);
     },
 
-    setVolumeForComplexAsset: function (id, volume, successCallback, errorCallback) {
-        return cordova.exec(successCallback, errorCallback, "NativeAudio", "setVolumeForComplexAsset", [id, parseFloat(volume)]);
+    setVolume: function (id, volume, successCallback, errorCallback) {
+        return cordova.exec(successCallback, errorCallback, "NativeAudio", "setVolume", [id, parseFloat(volume)]);
     },
 
-    setRateForComplexAsset: function (id, rate, successCallback, errorCallback) {
-        return cordova.exec(successCallback, errorCallback, "NativeAudio", "setRateForComplexAsset", [id, parseFloat(rate)]);
+    setRate: function (id, rate, successCallback, errorCallback) {
+        return cordova.exec(successCallback, errorCallback, "NativeAudio", "setRate", [id, parseFloat(rate)]);
     }
 };
