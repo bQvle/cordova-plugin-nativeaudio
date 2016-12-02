@@ -34,7 +34,7 @@ NSString* INFO_RATE_CHANGED = @"(NATIVE AUDIO) Rate changed.";
 
 	if (engine == nil) {
 		engine = [[AVAudioEngine alloc] init];
-		mixer = [AVAudioEngine mainMixerNode];
+		mixer = [engine mainMixerNode];
 		[engine startAndReturnError:nil];
 	}
 }
