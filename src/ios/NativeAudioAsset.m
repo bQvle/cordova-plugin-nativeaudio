@@ -25,15 +25,18 @@ static AVAudioMixerNode *mixer;
     }
     
     
+    
+    
     [self initBuffer:path];
-    
-    
     player = [[AVAudioPlayerNode alloc] init];
-    
-    player.volume = volume.floatValue;
-    
+    pitcher = [[AVAudioUnitTimePitch alloc] init];
+    [engine attachNode:pitcher];
     [engine attachNode:player];
-    [engine connect:player to:mixer format:PCMBuffer.format];
+    [engine connect:pitcher to:mixer format:PCMBuffer.format];
+    [engine connect:player to:pitcher format:PCMBuffer.format];
+    [self setRate: rate];
+    [self setVolume: volume];
+    
     
     if(delay)
     {
@@ -44,10 +47,6 @@ static AVAudioMixerNode *mixer;
     }
             
     initialVolume = volume;
-    
-    if (rate.floatValue < 1.0) {
-        [self setRate: rate];
-    }
     
     if (!Initialized) {
         [engine startAndReturnError:nil];
@@ -140,18 +139,18 @@ static AVAudioMixerNode *mixer;
 }
 
 
-bool rateInitialized = NO;
 - (void) setRate:(NSNumber*) rate;
 {
-    if (!rateInitialized) {
-        pitcher = [[AVAudioUnitTimePitch alloc] init];
-        [engine attachNode:pitcher];
-        [engine connect:pitcher to:mixer format:PCMBuffer.format];
-        [engine connect:player to:pitcher format:PCMBuffer.format];
-        rateInitialized = YES;
+    float rateValue = rate.floatValue;
+    if (rateValue == 1.0f) {
+        pitcher.bypass = YES;
     }
-    pitcher.rate = rate.floatValue;
-    pitcher.pitch = 1000 * rate.floatValue;
+    else {
+        pitcher.bypass = NO;
+        pitcher.rate = rateValue;
+        float pitchfactor = (pitcher.rate - 1.0f) * 1000;
+        pitcher.pitch = pitchfactor;
+    }
 }
 
 - (void) setCallbackAndId:(CompleteCallback)cb audioId:(NSString*)aID
