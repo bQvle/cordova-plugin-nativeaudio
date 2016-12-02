@@ -10,16 +10,8 @@ var hotjs = hotjs || {};
         // id -> obj mapping
         res_cache: {},
 
-        preloadSimple: function(id, assetPath, success, fail) {
-            var res = new Audio();
-            res.addEventListener('canplaythrough', success, false);
-            res.onerror = fail;
-            res.setAttribute('src', assetPath);
-            res.load();
-            this.res_cache[ id ] = res;
-        },
 
-        preloadComplex: function(id, assetPath, volume, delay, success, fail) {
+        preload: function(id, assetPath, volume, delay, success, fail) {
             var res = new Audio();
             res.addEventListener('canplaythrough', success, false);
             res.onerror = fail;

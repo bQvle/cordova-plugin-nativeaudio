@@ -27,7 +27,7 @@ module.exports  = {
     },
     
     preload: function(id, assetPath, volume, rate, successCallback, errorCallback) {
-        return cordova.exec(successCallback, errorCallback, "NativeAudio", "preloadComplex", [id, assetPath, parseFloat(volume), parseFloat(rate)]);
+        return cordova.exec(successCallback, errorCallback, "NativeAudio", "preload", [id, assetPath, parseFloat(volume), parseFloat(rate)]);
     },
 
     play: function(id, successCallback, errorCallback, completeCallback) {
